@@ -1,0 +1,33 @@
+import numpy as np
+from collections import Counter
+
+# func to calculate distance bewtween two point
+def euclidean_distance(p1, p2): # x1, x2 represent coordinate (x1, y1), (x2, y2)
+    return np.sqrt(np.sum((p1-p2)**2))
+class KNN:
+    def __init__(self, k, choice): # choice = classification or regression
+        self.k = k # get the k value
+        self.choice = choice
+    
+    def fit(self, X, y): # pass in based-on data
+        # store it 
+        self.X_train = X # econding field
+        self.y_train = y # the labels
+        
+    def predict(self, X): # pass in data we want to predict
+        predicted_labels = [self._predict(x) for x in X] # apply predict for every data in dataset X
+        return np.array(predicted_labels)
+    
+    def _predict(self, x):
+        # cal distance from xm, m, mm,,m to every x_train in X_train
+        distances = [euclidean_distance(x, x_train) for x_train in self.X_train]
+        # sort and pick k first samples
+        k_indices = np.argsort(distances)[:self.k] 
+        # get k nearest labels
+        k_nearest_labels = [self.y_train[i] for i in k_indices] # get the target val
+        # get the most common by count labels
+        if self.choice == 'classification':
+            most_common = Counter(k_nearest_labels).most_common(1)
+            return most_common[0][0]
+        if self.choice == 'regression':
+            mean = sum(k_nearest_labels) / len(k_nearest_labels)
